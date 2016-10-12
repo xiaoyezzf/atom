@@ -16,7 +16,7 @@ describe('AtomApplication', function () {
 
   let originalAppQuit, originalAtomHome, atomApplicationsToDestroy
 
-  beforeEach(function () {
+  beforeEach(() => {
     originalAppQuit = electron.app.quit
     mockElectronAppQuit()
     originalAtomHome = process.env.ATOM_HOME
@@ -32,7 +32,7 @@ describe('AtomApplication', function () {
     atomApplicationsToDestroy = []
   })
 
-  afterEach(async function () {
+  afterEach(async () =>{
     process.env.ATOM_HOME = originalAtomHome
     for (let atomApplication of atomApplicationsToDestroy) {
       await atomApplication.destroy()
@@ -41,8 +41,8 @@ describe('AtomApplication', function () {
     electron.app.quit = originalAppQuit
   })
 
-  describe('launch', function () {
-    it('can open to a specific line number of a file', async function () {
+  describe('launch', () => {
+    it('can open to a specific line number of a file', async () =>{
       const filePath = path.join(makeTempDir(), 'new-file')
       fs.writeFileSync(filePath, '1\n2\n3\n4\n')
       const atomApplication = buildAtomApplication()
@@ -59,7 +59,7 @@ describe('AtomApplication', function () {
       assert.equal(cursorRow, 2)
     })
 
-    it('can open to a specific line and column of a file', async function () {
+    it('can open to a specific line and column of a file', async () =>{
       const filePath = path.join(makeTempDir(), 'new-file')
       fs.writeFileSync(filePath, '1\n2\n3\n4\n')
       const atomApplication = buildAtomApplication()
@@ -76,7 +76,7 @@ describe('AtomApplication', function () {
       assert.deepEqual(cursorPosition, {row: 1, column: 1})
     })
 
-    it('removes all trailing whitespace and colons from the specified path', async function () {
+    it('removes all trailing whitespace and colons from the specified path', async () =>{
       let filePath = path.join(makeTempDir(), 'new-file')
       fs.writeFileSync(filePath, '1\n2\n3\n4\n')
       const atomApplication = buildAtomApplication()
@@ -94,7 +94,7 @@ describe('AtomApplication', function () {
     })
 
     if (process.platform === 'darwin' || process.platform === 'win32') {
-      it('positions new windows at an offset distance from the previous window', async function () {
+      it('positions new windows at an offset distance from the previous window', async () =>{
         const atomApplication = buildAtomApplication()
 
         const window1 = atomApplication.launch(parseCommandLine([makeTempDir()]))
@@ -112,7 +112,7 @@ describe('AtomApplication', function () {
       })
     }
 
-    it('reuses existing windows when opening paths, but not directories', async function () {
+    it('reuses existing windows when opening paths, but not directories', async () =>{
       const dirAPath = makeTempDir("a")
       const dirBPath = makeTempDir("b")
       const dirCPath = makeTempDir("c")
@@ -151,7 +151,7 @@ describe('AtomApplication', function () {
       assert.deepEqual(await getTreeViewRootDirectories(window2), [dirCPath])
     })
 
-    it('adds folders to existing windows when the --add option is used', async function () {
+    it('adds folders to existing windows when the --add option is used', async () =>{
       const dirAPath = makeTempDir("a")
       const dirBPath = makeTempDir("b")
       const dirCPath = makeTempDir("c")
@@ -193,7 +193,7 @@ describe('AtomApplication', function () {
       assert.deepEqual(await getTreeViewRootDirectories(window1), [dirAPath, dirCPath, dirBPath])
     })
 
-    it('persists window state based on the project directories', async function () {
+    it('persists window state based on the project directories', async () =>{
       const tempDirPath = makeTempDir()
       const atomApplication = buildAtomApplication()
       const window1 = atomApplication.launch(parseCommandLine([path.join(tempDirPath, 'new-file')]))
@@ -218,7 +218,7 @@ describe('AtomApplication', function () {
       assert.equal(window2Text, 'Hello World!')
     })
 
-    it('shows all directories in the tree view when multiple directory paths are passed to Atom', async function () {
+    it('shows all directories in the tree view when multiple directory paths are passed to Atom', async () =>{
       const dirAPath = makeTempDir("a")
       const dirBPath = makeTempDir("b")
       const dirBSubdirPath = path.join(dirBPath, 'c')
@@ -240,7 +240,7 @@ describe('AtomApplication', function () {
       assert.deepEqual(treeViewPaths, [dirAPath, dirBPath])
     })
 
-    it('reuses windows with no project paths to open directories', async function () {
+    it('reuses windows with no project paths to open directories', async () =>{
       const tempDirPath = makeTempDir()
       const atomApplication = buildAtomApplication()
       const window1 = atomApplication.launch(parseCommandLine([]))
@@ -251,7 +251,7 @@ describe('AtomApplication', function () {
       await conditionPromise(async () => (await getTreeViewRootDirectories(reusedWindow)).length > 0)
     })
 
-    it('opens a new window with a single untitled buffer when launched with no path, even if windows already exist', async function () {
+    it('opens a new window with a single untitled buffer when launched with no path, even if windows already exist', async () =>{
       const atomApplication = buildAtomApplication()
       const window1 = atomApplication.launch(parseCommandLine([]))
       await focusWindow(window1)
@@ -270,7 +270,7 @@ describe('AtomApplication', function () {
       assert.deepEqual(atomApplication.windows, [window1, window2])
     })
 
-    it('does not open an empty editor when opened with no path if the core.openEmptyEditorOnStart config setting is false', async function () {
+    it('does not open an empty editor when opened with no path if the core.openEmptyEditorOnStart config setting is false', async () =>{
       const configPath = path.join(process.env.ATOM_HOME, 'config.cson')
       const config = season.readFileSync(configPath)
       if (!config['*'].core) config['*'].core = {}
@@ -290,7 +290,7 @@ describe('AtomApplication', function () {
       assert.equal(itemCount, 0)
     })
 
-    it('opens an empty text editor and loads its parent directory in the tree-view when launched with a new file path', async function () {
+    it('opens an empty text editor and loads its parent directory in the tree-view when launched with a new file path', async () =>{
       const atomApplication = buildAtomApplication()
       const newFilePath = path.join(makeTempDir(), 'new-file')
       const window = atomApplication.launch(parseCommandLine([newFilePath]))
@@ -305,7 +305,7 @@ describe('AtomApplication', function () {
       assert.deepEqual(await getTreeViewRootDirectories(window), [path.dirname(newFilePath)])
     })
 
-    it('adds a remote directory to the project when launched with a remote directory', async function () {
+    it('adds a remote directory to the project when launched with a remote directory', async () =>{
       const packagePath = path.join(__dirname, '..', 'fixtures', 'packages', 'package-with-directory-provider')
       const packagesDirPath = path.join(process.env.ATOM_HOME, 'packages')
       fs.mkdirSync(packagesDirPath)
@@ -334,7 +334,7 @@ describe('AtomApplication', function () {
       }
     })
 
-    it('reopens any previously opened windows when launched with no path', async function () {
+    it('reopens any previously opened windows when launched with no path', async () =>{
       const tempDirPath1 = makeTempDir()
       const tempDirPath2 = makeTempDir()
 
@@ -356,7 +356,7 @@ describe('AtomApplication', function () {
       assert.deepEqual(await getTreeViewRootDirectories(app2Window2), [tempDirPath2])
     })
 
-    it('does not reopen any previously opened windows when launched with no path and `core.restorePreviousWindowsOnStart` is false', async function () {
+    it('does not reopen any previously opened windows when launched with no path and `core.restorePreviousWindowsOnStart` is false', async () =>{
       const atomApplication1 = buildAtomApplication()
       const app1Window1 = atomApplication1.launch(parseCommandLine([makeTempDir()]))
       await focusWindow(app1Window1)
@@ -375,9 +375,9 @@ describe('AtomApplication', function () {
       assert.deepEqual(await getTreeViewRootDirectories(app2Window), [])
     })
 
-    describe('when closing the last window', function () {
+    describe('when closing the last window', () => {
       if (process.platform === 'linux' || process.platform === 'win32') {
-        it('quits the application', async function () {
+        it('quits the application', async () =>{
           const atomApplication = buildAtomApplication()
           const window = atomApplication.launch(parseCommandLine([path.join(makeTempDir("a"), 'file-a')]))
           await focusWindow(window)
@@ -386,7 +386,7 @@ describe('AtomApplication', function () {
           assert(electron.app.hasQuitted())
         })
       } else if (process.platform === 'darwin') {
-        it('leaves the application open', async function () {
+        it('leaves the application open', async () =>{
           const atomApplication = buildAtomApplication()
           const window = atomApplication.launch(parseCommandLine([path.join(makeTempDir("a"), 'file-a')]))
           await focusWindow(window)
@@ -398,8 +398,8 @@ describe('AtomApplication', function () {
     })
   })
 
-  describe('before quitting', function () {
-    it('waits until all the windows have saved their state and then quits', async function () {
+  describe('before quitting', () => {
+    it('waits until all the windows have saved their state and then quits', async () =>{
       const dirAPath = makeTempDir("a")
       const dirBPath = makeTempDir("b")
       const atomApplication = buildAtomApplication()
@@ -479,7 +479,7 @@ describe('AtomApplication', function () {
 
   function clearElectronSession () {
     return new Promise(function (resolve) {
-      electron.session.defaultSession.clearStorageData(function () {
+      electron.session.defaultSession.clearStorageData(() => {
         // Resolve promise on next tick, otherwise the process stalls. This
         // might be a bug in Electron, but it's probably fixed on the newer
         // versions.

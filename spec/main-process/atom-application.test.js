@@ -398,6 +398,29 @@ describe('AtomApplication', function () {
     })
   })
 
+  describe('benchmark mode', function () {
+    this.timeout(10 * 1000)
+
+    it.only('runs the given file and outputs the results', async () => {
+      const stdoutBuffer = new Buffer(0)
+      const fakeBenchmarkPath = path.join(__dirname, '..', 'fixtures', 'fake-benchmark.js')
+
+      let printedContent = ''
+      function printSpy (content) { printedContent += content }
+
+      const atomApplication = buildAtomApplication({print: printSpy})
+      const benchmarkWindow = atomApplication.launch(parseCommandLine([
+        '--benchmark',
+        fakeBenchmarkPath
+      ]))
+
+      await benchmarkWindow.closedPromise
+
+      assert.match(printedContent, /action 1.*100ms/)
+      assert.match(printedContent, /action 2.*200ms/)
+    })
+  })
+
   describe('before quitting', () => {
     it('waits until all the windows have saved their state and then quits', async () =>{
       const dirAPath = makeTempDir("a")

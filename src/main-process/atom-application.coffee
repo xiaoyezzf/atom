@@ -108,18 +108,34 @@ class AtomApplication
     else
       @loadState(options) or @openPath(options)
 
-  openWithOptions: ({initialPaths, pathsToOpen, executedFrom, urlsToOpen, test, pidToKillWhenClosed, devMode, safeMode, newWindow, logFile, profileStartup, timeout, clearWindowState, addToLastWindow, env}) ->
+  openWithOptions: (options) ->
+    {initialPaths, pathsToOpen, executedFrom, urlsToOpen, benchmark, test,
+     pidToKillWhenClosed, devMode, safeMode, newWindow, logFile, profileStartup,
+     timeout, clearWindowState, addToLastWindow, env} = options
+
     app.focus()
 
     if test
-      @runTests({headless: true, devMode, @resourcePath, executedFrom, pathsToOpen, logFile, timeout, env})
+      @runTests({
+        headless: true, devMode, @resourcePath, executedFrom, pathsToOpen,
+        logFile, timeout, env
+      })
+    else if benchmark
+      @runBenchmarks({@resourcePath, pathsToOpen})
     else if pathsToOpen.length > 0
-      @openPaths({initialPaths, pathsToOpen, executedFrom, pidToKillWhenClosed, newWindow, devMode, safeMode, profileStartup, clearWindowState, addToLastWindow, env})
+      @openPaths({
+        initialPaths, pathsToOpen, executedFrom, pidToKillWhenClosed, newWindow,
+        devMode, safeMode, profileStartup, clearWindowState, addToLastWindow, env
+      })
     else if urlsToOpen.length > 0
-      @openUrl({urlToOpen, devMode, safeMode, env}) for urlToOpen in urlsToOpen
+      for urlToOpen in urlsToOpen
+        @openUrl({urlToOpen, devMode, safeMode, env})
     else
       # Always open a editor window if this is the first instance of Atom.
-      @openPath({initialPaths, pidToKillWhenClosed, newWindow, devMode, safeMode, profileStartup, clearWindowState, addToLastWindow, env})
+      @openPath({
+        initialPaths, pidToKillWhenClosed, newWindow, devMode, safeMode, profileStartup,
+        clearWindowState, addToLastWindow, env
+      })
 
   # Public: Removes the {AtomWindow} from the global window list.
   removeWindow: (window) ->
@@ -650,6 +666,19 @@ class AtomApplication
     isSpec = true
     safeMode ?= false
     new AtomWindow(this, @fileRecoveryService, {windowInitializationScript, resourcePath, headless, isSpec, devMode, testRunnerPath, legacyTestRunnerPath, testPaths, logFile, safeMode, env})
+
+  runBenchmarks: ({resourcePath, pathsToOpen}) ->
+    windowInitializationScript = require.resolve(
+      path.resolve(__dirname, '..', '..', 'src', 'initialize-benchmark-window')
+    )
+
+    new AtomWindow(this, @fileRecoveryService, {
+      windowInitializationScript,
+      isSpec: true,
+      devMode: true,
+      resourcePath,
+      pathsToOpen
+    })
 
   resolveTestRunnerPath: (testPath) ->
     FindParentDir ?= require 'find-parent-dir'

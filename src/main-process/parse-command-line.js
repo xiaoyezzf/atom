@@ -45,6 +45,7 @@ module.exports = function parseCommandLine (processArgs) {
     'portable',
     'Set portable mode. Copies the ~/.atom folder to be a sibling of the installed Atom location if a .atom folder is not already there.'
   )
+  options.boolean('benchmark').describe('benchmark', 'Run the specified benchmarks.')
   options.alias('t', 'test').boolean('t').describe('t', 'Run the specified specs and exit with error code on failures.')
   options.alias('m', 'main-process').boolean('m').describe('m', 'Run the specified specs in the main process.')
   options.string('timeout').describe(
